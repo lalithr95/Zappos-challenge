@@ -142,9 +142,7 @@ class Zappos
 
   def printStyle key, value, data
     # Print with little Style ;)
-    5.times { print "="}
-    puts "Product Combination Value " + value.to_s
-    5.times { print "="}
+    puts "="*5 + "Product Combination Value " + value.to_s + "="*5
     puts key.to_s
     key.each do |k|
       puts "Name : " + data[k][1]
