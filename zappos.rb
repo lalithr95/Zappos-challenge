@@ -29,6 +29,7 @@ class Zappos
   end
   
   def getProducts()
+    #Fetches only required products and sorts on basis of price
     searchTerm = ""
     @itemLimit = 100
     if ( @desired_amount / @desired_products ).round(2) <= 10.00
@@ -51,7 +52,7 @@ class Zappos
   end
   
   def filterProducts(response)
-    # Filter products which have amount more desired_amount
+    # Filter products which have amount less than desired_amount. High price products are filtered in this phace
     result = {}
     result['model'] = []
     response['results'].each do |record|
@@ -63,6 +64,9 @@ class Zappos
   end
   
   def getCombination(data)
+    # Generates combination of products
+    # A caching system can be implemented on combination obtained. Whenever user uses the program again combination need
+    # not be computed.
     product = {}
     data['model'].each do |record|
       image_data = Hash.new
@@ -75,6 +79,7 @@ class Zappos
   end
 
   def getProductImage(data, productId, styleId)
+    # Fetches product image of product
     url = "http://api.zappos.com/Image?productId=#{productId}&key=#{@apiKey}"
     response = HTTParty.get(url)
     response = JSON.parse(response.body)
@@ -82,6 +87,8 @@ class Zappos
   end
   
   def arrageProducts(comb, data)
+    # comb contains key as list and value as price and we sort on basis of value
+    # Extra credit: Sort the combinations by how close they are to the target total price.
     result = {}
     comb.each do |a|
       result[a] = calculatePrice(a, data) if calculatePrice(a, data) < @desired_amount
@@ -91,6 +98,7 @@ class Zappos
   end
   
   def calculatePrice(a, data)
+    # Calculates total price of each combination
     price = 0.0
     a.each do |i|
       price += data[i][0].gsub("$","").to_f
@@ -99,6 +107,8 @@ class Zappos
   end
   
   def printResult(result, data)
+    # Prints result to User and also downloads the image respected to the product to user
+    # Image download can be pushed as a background job
     i = 0
     uniqueKeys = []
     result.each do |key, value|
@@ -131,6 +141,7 @@ class Zappos
   end
 
   def printStyle key, value, data
+    # Print with little Style ;)
     5.times { print "="}
     puts "Product Combination Value " + value.to_s
     5.times { print "="}
@@ -142,7 +153,7 @@ class Zappos
   end
 end
 
-# Object creation
+# Object creation and method invocation
 z = Zappos.new
 products = z.getProducts()
 combination, data = z.getCombination(products)
